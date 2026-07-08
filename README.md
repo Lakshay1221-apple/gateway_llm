@@ -3,7 +3,8 @@
 This repository contains a Jupyter notebook that demonstrates how to use
 LiteLLM as a gateway across multiple LLM providers. The notebook walks through
 provider setup, direct model calls, fallback routing, token and cost tracking,
-local caching, model aliases, and simple load balancing.
+local caching, model aliases, load balancing, observability callbacks,
+LangChain integration, task-aware routing, and input guardrails.
 
 ## What This Project Covers
 
@@ -15,6 +16,11 @@ local caching, model aliases, and simple load balancing.
 - Enabling local caching for repeated prompts.
 - Creating friendly model aliases with LiteLLM `Router`.
 - Distributing requests across multiple deployments with `simple-shuffle`.
+- Comparing least-busy, latency-aware, and cost-aware routing patterns.
+- Capturing request metadata with LiteLLM callbacks.
+- Calling LiteLLM models from LangChain using `ChatLiteLLM`.
+- Applying simple guardrails for PII redaction, prompt injection, and blocked
+  topics.
 
 ## Repository Structure
 
@@ -34,6 +40,12 @@ pip install litellm langchain langchain-community langchain-openai python-dotenv
 
 If you are running inside Jupyter, the first notebook cell includes the same
 install command as a commented `%pip` command.
+
+The LangChain integration examples also require:
+
+```bash
+pip install langchain-litellm
+```
 
 ## Environment Variables
 
@@ -76,6 +88,16 @@ examples require `OPENAI_API_KEY`.
 | Enable Local Caching | Compares first-call provider latency with cached-response latency. |
 | Route With Aliases | Maps friendly names to provider-specific model deployments. |
 | Load Balance | Distributes requests across a shared model pool. |
+| Least-Busy Routing | Routes requests toward deployments with lower current load. |
+| Latency-Based Routing | Prefers deployments with lower observed response times. |
+| Cost-Aware Routing | Compares models with different expected price profiles. |
+| LiteLLM Callbacks | Records prompt, token, latency, cost, and user metadata. |
+| LangChain Adapter | Uses `ChatLiteLLM` inside a standard LangChain chain. |
+| LangChain Fallbacks | Adds model fallbacks with LangChain's `with_fallbacks()`. |
+| Smart Router | Classifies tasks and chooses model chains for each task type. |
+| PII Guardrail | Redacts sensitive data before sending prompts to a model. |
+| Prompt Injection Guardrail | Blocks common prompt-injection and jailbreak attempts. |
+| Topic Guardrail | Refuses requests that match restricted keyword categories. |
 
 ## Notes
 
@@ -83,5 +105,7 @@ examples require `OPENAI_API_KEY`.
 - Costs shown by LiteLLM are estimates and depend on provider pricing metadata.
 - Fallback and router behavior depends on valid model names and available API
   keys.
+- Guardrail examples are intentionally simple and should be expanded before
+  production use.
 - The notebook is designed as a learning and prototyping workflow rather than a
   production gateway service.
